@@ -1,0 +1,255 @@
+/* Custom Styles for Security Threat Detection App */
+
+:root {
+    --primary-color: #007bff;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+}
+
+/* Navigation */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+    font-weight: 600;
+    font-size: 1.3rem;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 5rem 0;
+    margin-bottom: 3rem;
+}
+
+.hero-section h1 {
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Cards */
+.card {
+    border: none;
+    border-radius: 10px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+}
+
+.card-header {
+    border-radius: 10px 10px 0 0;
+    padding: 1.5rem;
+}
+
+/* Statistics */
+.stat-box {
+    padding: 2rem;
+    border-radius: 10px;
+    background: white;
+    border-left: 4px solid var(--primary-color);
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.stat-box h3 {
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.stat-box p {
+    color: #666;
+    margin-bottom: 0;
+}
+
+/* Forms */
+.form-control {
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    padding: 0.75rem;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.15);
+}
+
+.form-label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+/* Buttons */
+.btn {
+    border-radius: 6px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.btn-success {
+    background-color: var(--success-color);
+    border-color: var(--success-color);
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+/* Alerts */
+.alert {
+    border-radius: 8px;
+    border: none;
+    padding: 1rem 1.5rem;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+/* Progress Bar */
+.progress {
+    height: 2rem;
+    border-radius: 6px;
+    background-color: #e9ecef;
+}
+
+.progress-bar {
+    background: linear-gradient(90deg, var(--primary-color), var(--info-color));
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Input Group */
+.input-group {
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.input-group .form-control {
+    border-radius: 6px 0 0 6px;
+}
+
+.input-group .btn {
+    border-radius: 0 6px 6px 0;
+}
+
+/* Code Block */
+code {
+    background-color: #f5f5f5;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    color: #d63384;
+    font-size: 0.9rem;
+}
+
+/* Badges */
+.badge {
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+/* Spinner */
+.spinner-border {
+    width: 2rem;
+    height: 2rem;
+}
+
+/* Footer */
+footer {
+    background-color: var(--dark-color);
+    border-top: 1px solid #dee2e6;
+    margin-top: 5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 3rem 0;
+    }
+
+    .hero-section h1 {
+        font-size: 2rem;
+    }
+
+    .stat-box {
+        margin-bottom: 1rem;
+    }
+
+    .card {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Loading Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#resultsContainer {
+    animation: fadeIn 0.3s ease-in;
+}
+
+/* Utility Classes */
+.bg-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.shadow-sm {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+}
+
+.shadow {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+}

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help - Security Threat Detection</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/"><i class="bi bi-shield-check"></i> Security Threat Detection</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/help">Help</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+                <h1 class="mb-4"><i class="bi bi-question-circle"></i> Help & FAQ</h1>
+
+                <div class="accordion" id="helpAccordion">
+                    <!-- Email Detection FAQ -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#emailFaq">
+                                <i class="bi bi-envelope-check"></i> Email Detector
+                            </button>
+                        </h2>
+                        <div id="emailFaq" class="accordion-collapse collapse show" data-bs-parent="#helpAccordion">
+                            <div class="accordion-body">
+                                <h6>How to use the Email Detector?</h6>
+                                <p>1. Go to <strong>Email Detector</strong><br>
+                                2. Paste the email body in the first field<br>
+                                3. (Optional) Paste email headers in the second field<br>
+                                4. Click <strong>Analyze Email</strong><br>
+                                5. Review the results and recommendations</p>
+
+                                <hr>
+
+                                <h6>What does "PHISHING" mean?</h6>
+                                <p>Phishing is a fraudulent attempt to steal your information (passwords, credit cards, etc.) by disguising an email as legitimate.</p>
+
+                                <hr>
+
+                                <h6>What are the email features analyzed?</h6>
+                                <p>The system checks:
+                                <ul>
+                                    <li>Email authentication (SPF, DKIM, DMARC)</li>
+                                    <li>URL analysis and suspicious links</li>
+                                    <li>Content patterns and keywords</li>
+                                    <li>Sender reputation indicators</li>
+                                    <li>Language and formatting anomalies</li>
+                                </ul>
+                                </p>
+
+                                <hr>
+
+                                <h6>What's a good confidence score?</h6>
+                                <p>
+                                    <span class="badge bg-success">&gt;80%</span> Very likely phishing or legitimate<br>
+                                    <span class="badge bg-warning">50-80%</span> Moderate confidence<br>
+                                    <span class="badge bg-info">&lt;50%</span> Low confidence, review manually
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- File Analyzer FAQ -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#fileFaq">
+                                <i class="bi bi-file-earmark-binary"></i> File Analyzer
+                            </button>
+                        </h2>
+                        <div id="fileFaq" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                            <div class="accordion-body">
+                                <h6>How to use the File Analyzer?</h6>
+                                <p>1. Go to <strong>File Analyzer</strong><br>
+                                2. Click on the file input or drag & drop<br>
+                                3. Select a file from your computer<br>
+                                4. Results appear automatically<br>
+                                5. Review file hashes and analysis</p>
+
+                                <hr>
+
+                                <h6>What file types are supported?</h6>
+                                <p>Supported formats: .exe, .dll, .bin, .elf, .zip, .rar, .pdf, .doc, .docx<br>
+                                Maximum file size: 50MB</p>
+
+                                <hr>
+
+                                <h6>What are file hashes used for?</h6>
+                                <p>
+                                    <strong>MD5, SHA1, SHA256</strong> are unique fingerprints of your file.<br>
+                                    You can use these hashes to:
+                                    <ul>
+                                        <li>Look up the file on VirusTotal.com</li>
+                                        <li>Verify file authenticity</li>
+                                        <li>Track file origins</li>
+                                    </ul>
+                                </p>
+
+                                <hr>
+
+                                <h6>What is file entropy?</h6>
+                                <p>
+                                    <strong>High entropy (7-8)</strong> = Compressed or encrypted (more suspicious)<br>
+                                    <strong>Low entropy (0-3)</strong> = Plain text or simple data (less suspicious)<br>
+                                    This helps detect malware that's compressed to hide its true nature.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- General FAQ -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#generalFaq">
+                                <i class="bi bi-info-circle"></i> General Questions
+                            </button>
+                        </h2>
+                        <div id="generalFaq" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                            <div class="accordion-body">
+                                <h6>How accurate is this system?</h6>
+                                <p>Accuracy depends on the model used:
+                                <ul>
+                                    <li>Email detection: 50-95% (varies with data quality)</li>
+                                    <li>File analysis: 60-98% (varies with file types)</li>
+                                </ul>
+                                Always use this as a tool, not the sole decision-maker.</p>
+
+                                <hr>
+
+                                <h6>Is my data safe?</h6>
+                                <p>
+                                    <strong>In this demonstration version:</strong> Uploaded files are analyzed and deleted immediately.<br>
+                                    For production use, implement proper security controls and compliance measures.
+                                </p>
+
+                                <hr>
+
+                                <h6>What should I do if phishing is detected?</h6>
+                                <p>
+                                    1. Do NOT click any links in the email<br>
+                                    2. Do NOT download attachments<br>
+                                    3. Do NOT reply with personal information<br>
+                                    4. Delete the email<br>
+                                    5. Report to your IT security team or email provider
+                                </p>
+
+                                <hr>
+
+                                <h6>What should I do if malware is detected?</h6>
+                                <p>
+                                    1. Do NOT execute the file<br>
+                                    2. Quarantine the file immediately<br>
+                                    3. Report to your IT security team<br>
+                                    4. Run a full system scan with antivirus<br>
+                                    5. Review what could have been compromised
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-info mt-4">
+                    <strong><i class="bi bi-lightbulb"></i> Tip:</strong> For best results, combine this tool with other security measures like email filters, antivirus software, and user awareness training.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2025 Security Threat Detection System | Defensive Security</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
