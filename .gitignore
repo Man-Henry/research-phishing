@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+
+# PyInstaller
+*.spec
+build/
+dist/
+*.egg-info/
+
+# Large files - không push lên GitHub
+*.exe
+*.zip
+*.rar
+*.7z
+
+# Large datasets - quá 50MB
+data/training_samples/PhiUSIIL_Phishing_URL_Dataset.csv
+data/training_samples/*.csv
+
+# Models - file lớn
+data/models/*.pkl
+data/models/*.joblib
+
+# Uploads
+uploads/*
+!uploads/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
