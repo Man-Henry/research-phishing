@@ -15,15 +15,16 @@ build/
 dist/
 *.egg-info/
 
-# Large files - không push lên GitHub
-*.exe
+# Large files - sử dụng Git LFS
+# *.exe - tracked by LFS
+# data/training_samples/PhiUSIIL_Phishing_URL_Dataset.csv - tracked by LFS
 *.zip
 *.rar
 *.7z
 
-# Large datasets - quá 50MB
-data/training_samples/PhiUSIIL_Phishing_URL_Dataset.csv
-data/training_samples/*.csv
+# Other CSV datasets
+data/training_samples/email_*.csv
+data/training_samples/spam*.csv
 
 # Models - file lớn
 data/models/*.pkl
