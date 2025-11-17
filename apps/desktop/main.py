@@ -30,7 +30,16 @@ from PyQt6.QtCore import Qt, QThread, pyqtSignal
 from PyQt6.QtGui import QFont, QPixmap
 
 # Import project modules
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+# Handle both development and PyInstaller frozen environment
+if getattr(sys, 'frozen', False):
+    # Running as compiled exe - add bundled modules to path
+    import os
+    base_path = sys._MEIPASS
+    sys.path.insert(0, base_path)
+else:
+    # Running as script
+    sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
 from src.detectors.email_detector import EmailPhishingDetector
 from src.detectors.file_analyzer import MalwareAnalyzer
 from src.ml.model_trainer import ModelTrainer
@@ -734,9 +743,38 @@ class TrainingWorker(QThread):
                     y_list.extend([label] * len(data))
                     
             elif file_path.suffix == '.csv':
-                # Load CSV
+                # Load CSV with encoding fallback
                 import pandas as pd
-                df = pd.read_csv(file_path)
+                
+                # Try multiple encodings
+                encodings = ['utf-8', 'latin-1', 'iso-8859-1', 'cp1252', 'utf-16']
+                df = None
+                last_error = None
+                successful_encoding = None
+                
+                for encoding in encodings:
+                    try:
+                        df = pd.read_csv(file_path, encoding=encoding)
+                        successful_encoding = encoding
+                        break  # Success
+                    except (UnicodeDecodeError, UnicodeError) as e:
+                        last_error = e
+                        continue
+                    except Exception as e:
+                        # Other errors (like parsing errors)
+                        last_error = e
+                        continue
+                
+                if df is None:
+                    raise ValueError(
+                        f"Could not read CSV file '{file_path.name}' with any encoding.\n"
+                        f"Tried: {', '.join(encodings)}\n"
+                        f"Last error: {last_error}\n\n"
+                        f"Tips:\n"
+                        f"• Try opening file in Excel and saving as UTF-8 CSV\n"
+                        f"• Check if file is corrupted\n"
+                        f"• Use text editor to verify file format"
+                    )
                 
                 # Remove non-numeric columns that might be IDs or filenames
                 non_feature_cols = []
@@ -788,14 +826,48 @@ class TrainingWorker(QThread):
                 # Validate no infinite values
                 X_data = X_data.replace([np.inf, -np.inf], 0)
                 
-                X_list.append(X_data.values)
+                # Store with metadata for validation
+                X_list.append((X_data.values, file_path.name, X_data.shape[1]))
                 y_list.extend(y_data.values)
         
         # Concatenate all data
         if not X_list:
             raise ValueError("No valid data loaded from files")
         
-        X = np.vstack(X_list)
+        # Check for consistent feature counts and normalize if needed
+        feature_counts = {}
+        for X_data, filename, n_features in X_list:
+            if n_features not in feature_counts:
+                feature_counts[n_features] = []
+            feature_counts[n_features].append(filename)
+        
+        # If multiple feature counts, normalize to max features
+        if len(feature_counts) > 1:
+            max_features = max(feature_counts.keys())
+            min_features = min(feature_counts.keys())
+            
+            # Log warning about normalization
+            print(f"⚠️ Normalizing datasets with different feature counts:")
+            for n_features, files in sorted(feature_counts.items()):
+                print(f"  • {n_features} features: {', '.join(files)}")
+            print(f"  → Padding all to {max_features} features (adding zeros)")
+            
+            # Normalize all arrays to max_features
+            normalized_list = []
+            for X_data, filename, n_features in X_list:
+                if n_features < max_features:
+                    # Pad with zeros
+                    padding = np.zeros((X_data.shape[0], max_features - n_features))
+                    X_normalized = np.hstack([X_data, padding])
+                    normalized_list.append(X_normalized)
+                else:
+                    normalized_list.append(X_data)
+            
+            X = np.vstack(normalized_list)
+        else:
+            # All same feature count, just stack
+            X = np.vstack([x[0] for x in X_list])
+        
         y = np.array(y_list)
         
         # Final validation
@@ -847,7 +919,7 @@ class TrainingTab(QWidget):
         # Instructions
         instructions = QLabel(
             "Train your own models with custom datasets:\n"
-            "• Email Model: CSV/NPY files with 17 email features\n"
+            "• Email Model: CSV/NPY files with 16 email features\n"
             "• File Model: CSV/NPY files with 11 file features\n"
             "• Files should contain features as columns and optional 'label' column"
         )
@@ -1093,7 +1165,14 @@ class MainWindow(QMainWindow):
         
         # Logo
         logo_label = QLabel()
-        logo_path = Path(__file__).parent.parent.parent / "resources" / "images" / "logo.png"
+        # Handle both development and frozen (exe) paths
+        if getattr(sys, 'frozen', False):
+            # Running as exe - resources are bundled
+            logo_path = Path(sys._MEIPASS) / "resources" / "images" / "logo.png"
+        else:
+            # Running as script
+            logo_path = Path(__file__).parent.parent.parent / "resources" / "images" / "logo.png"
+        
         if logo_path.exists():
             pixmap = QPixmap(str(logo_path))
             if not pixmap.isNull():

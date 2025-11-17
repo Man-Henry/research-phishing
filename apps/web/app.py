@@ -68,7 +68,7 @@ def file_analyzer_page():
 
 @app.route('/api/analyze-email', methods=['POST'])
 def analyze_email():
-    """Analyze email for phishing."""
+    """Analyze email for phishing with multilingual detection."""
     try:
         # Check if email detector is initialized
         if email_detector is None:
@@ -85,16 +85,21 @@ def analyze_email():
         email_content = data['email_content']
         email_headers = data.get('email_headers', {})
         
-        # Extract features
-        features = email_detector.extract_features(email_content, email_headers)
+        # Use multilingual analysis
+        analysis = email_detector.analyze_multilingual_email(email_content, email_headers)
         
-        # Make prediction
-        prediction, confidence = email_detector.predict(features)
+        # Extract results
+        is_phishing = analysis['is_phishing']
+        confidence = analysis['confidence']
+        features = analysis['features']
+        language_info = analysis['language']
+        multilingual_phishing = analysis['multilingual_phishing']
+        translation = analysis['translation']
         
         # Prepare response
         result = {
             'status': 'success',
-            'prediction': 'PHISHING' if prediction == 1 else 'LEGITIMATE',
+            'prediction': 'PHISHING' if is_phishing else 'LEGITIMATE',
             'confidence': f'{confidence:.1%}',
             'confidence_numeric': float(confidence),
             'features': {
@@ -106,7 +111,24 @@ def analyze_email():
                 'suspicious_keywords': int(features[7]),
                 'urgency_score': f'{features[9]:.2f}',
             },
-            'recommendation': 'Be cautious with this email' if prediction == 1 else 'Appears to be legitimate'
+            'language': {
+                'primary': language_info['primary'],
+                'confidence': language_info['confidence'],
+                'is_multilingual': language_info['is_multilingual'],
+                'all_detected': language_info['all_detected']
+            },
+            'multilingual_phishing': {
+                'detected': multilingual_phishing['detected'],
+                'keywords': multilingual_phishing['keywords'],
+                'keyword_count': multilingual_phishing['keyword_count'],
+                'risk_multiplier': multilingual_phishing['risk_multiplier']
+            },
+            'translation': translation,
+            'recommendation': (
+                '⚠️ PHISHING DETECTED - Do not click links or provide information' 
+                if is_phishing 
+                else '✅ Email appears legitimate'
+            )
         }
         
         return jsonify(result), 200

@@ -28,6 +28,12 @@ data/training_samples/*.csv
 # Models - file lớn
 data/models/*.pkl
 data/models/*.joblib
+*.pkl
+*.joblib
+
+# PyCache
+**/__pycache__/
+**/*.pyc
 
 # Uploads
 uploads/*

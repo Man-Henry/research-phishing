@@ -46,6 +46,9 @@ class ModelTrainer:
         """
         print("Training email phishing detection model...")
         
+        # Store feature count for later padding
+        self.email_n_features = X_train.shape[1]
+        
         # Scale features
         self.email_scaler = StandardScaler()
         X_train_scaled = self.email_scaler.fit_transform(X_train)
@@ -91,9 +94,11 @@ class ModelTrainer:
         print(f"Cross-validation F1 scores: {cv_scores}")
         print(f"Mean CV F1: {cv_scores.mean():.4f} (+/- {cv_scores.std():.4f})")
         
-        # Save model
+        # Save model and feature count
         self._save_model(self.email_model, 'email_phishing_detector.pkl')
         self._save_model(self.email_scaler, 'email_scaler.pkl')
+        # Save feature count metadata
+        joblib.dump({'n_features': self.email_n_features}, self.model_dir / 'email_metadata.pkl')
         
         return metrics
     

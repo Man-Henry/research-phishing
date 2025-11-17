@@ -5,8 +5,15 @@ Combines fast heuristic screening with Random Forest deep analysis
 
 import numpy as np
 from typing import Dict, Optional
-from .email_detector import EmailPhishingDetector
-from .file_analyzer import MalwareAnalyzer
+import sys
+
+# Handle imports for both development and PyInstaller
+try:
+    from .email_detector import EmailPhishingDetector
+    from .file_analyzer import MalwareAnalyzer
+except ImportError:
+    from src.detectors.email_detector import EmailPhishingDetector
+    from src.detectors.file_analyzer import MalwareAnalyzer
 
 
 class HybridEmailDetector:

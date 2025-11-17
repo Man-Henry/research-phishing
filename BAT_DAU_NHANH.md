@@ -1,5 +1,5 @@
-# Hướng Dẫn Nhanh - Hệ Thống Phát Hiện Lừa Đảo
-# Quick Start Guide - Phishing & Malware Detection System
+# 🚀 Hướng Dẫn Bắt Đầu Nhanh
+# Quick Start Guide - Phishing Detection System
 
 > **Ngôn ngữ / Language**: [Tiếng Việt](#vietnamese) | [English](#english)
 
@@ -8,46 +8,115 @@
 <a name="vietnamese"></a>
 ## 🇻🇳 PHIÊN BẢN TIẾNG VIỆT
 
-## 🚀 Bắt Đầu Trong 5 Phút
+## 📦 Cài Đặt Nhanh
 
-### Bước 1: Cài Đặt Dependencies (1 phút)
+### Cách 1: Sử Dụng File EXE (Đơn Giản Nhất)
+```
+1. Tải file PhishingDetector.exe
+2. Chạy file exe (không cần cài đặt)
+3. App sẽ tự động mở với giao diện đầy đủ
+```
+
+**Lưu ý**: 
+- File exe bao gồm tất cả dependencies
+- Không cần Python hay pip install
+- Kích thước: ~250-270 MB (bao gồm scipy, numpy, sklearn)
+
+### Cách 2: Chạy Từ Source Code
 ```bash
-# Kích hoạt môi trường ảo
+# Bước 1: Kích hoạt môi trường ảo
 .venv\Scripts\activate  # Windows
-source .venv/bin/activate  # Linux/Mac
 
-# Cài đặt packages
+# Bước 2: Cài đặt dependencies (chỉ lần đầu)
 pip install -r config/requirements.txt
-```
 
-### Bước 2: Kiểm Tra Cài Đặt (30 giây)
-```bash
-python check_system.py
+# Bước 3: Khởi chạy ứng dụng
+python main.py
 ```
-✅ Sẽ hiển thị: "All systems operational!"
-
-### Bước 3: Khởi Chạy Ứng Dụng (10 giây)
-
-#### GUI Desktop (Khuyến nghị)
-```bash
-python main.py desktop
-```
-- Không hiển thị cửa sổ console
-- Giao diện theme tối
-- Nhấn "📧 Email Detector" hoặc "🔒 File Analyzer"
-
-#### Giao Diện Web
-```bash
-python main.py web
-```
-- Mở trình duyệt: http://localhost:5000
-- Nhấn "Check Email" hoặc "Scan File"
 
 ---
 
 ## 📧 Test Phát Hiện Email
 
-### Ví Dụ 1: Email Lừa Đảo
+### Ví Dụ 1: Email Lừa Đảo (Tiếng Việt)
+```
+Dán vào Email Detector:
+
+From: admin@paypa1.com
+Subject: Khẩn cấp: Cần xác minh tài khoản
+
+Tài khoản của bạn sẽ bị đình chỉ!
+Nhấn vào đây ngay lập tức: http://bit.ly/verify123
+Xác nhận tài khoản của bạn để tránh bị khóa.
+```
+
+**Kết Quả Mong Đợi:**
+- 🚨 ĐÃ PHÁT HIỆN LỪA ĐẢO
+- 🌍 Ngôn ngữ: Tiếng Việt (Vietnamese)
+- ⚠️ Từ khóa lừa đảo: xác nhận tài khoản, khẩn cấp, nhấp vào đây
+- 🔢 Risk Multiplier: 1.2x (ngôn ngữ rủi ro cao)
+- Rủi ro: High - Critical (Cao - Nghiêm trọng)
+- Độ tin cậy: 70-95%
+- Lý do: URL rút gọn (bit.ly), từ khóa đáng ngờ, tên miền giả mạo
+
+### Ví Dụ 1B: Email Lừa Đảo (Tiếng Anh)
+```
+Dán vào:
+
+From: security@paypa1-secure.com
+Subject: URGENT: Account Verification Required
+
+Your account will be suspended immediately!
+Click here to verify now: http://bit.ly/verify
+Unusual activity detected on your account.
+```
+
+**Kết Quả Mong Đợi:**
+- 🚨 ĐÃ PHÁT HIỆN LỪA ĐẢO
+- 🌍 Ngôn ngữ: English
+- ⚠️ Từ khóa lừa đảo: urgent, verify account, unusual activity, click here
+- Độ tin cậy: 85-100%
+
+### Ví Dụ 1C: Email Lừa Đảo (Tiếng Trung)
+```
+Dán vào:
+
+From: admin@bank-secure.com
+Subject: 紧急通知
+
+您的账户将被锁定！
+请立即点击这里验证账户：http://bit.ly/verify
+发现异常活动，需要确认身份。
+```
+
+**Kết Quả Mong Đợi:**
+- 🚨 ĐÃ PHÁT HIỆN LỪA ĐẢO
+- 🌍 Ngôn ngữ: 中文 (Chinese)
+- ⚠️ Từ khóa lừa đảo: 验证账户, 紧急, 异常活动, 点击这里, 确认身份
+- 🔢 Risk Multiplier: 1.2x (high-risk language)
+- 🔄 Translation: Available (dịch sang tiếng Anh)
+- Độ tin cậy: 90-100%
+
+### Ví Dụ 1D: Email Đa Ngôn Ngữ (Multilingual)
+```
+Dán vào:
+
+Subject: Khẩn cấp URGENT 紧急
+
+Your account tài khoản 账户 will be suspended!
+Click here nhấp vào đây 点击这里: http://bit.ly/verify
+Verify xác nhận 验证 your account NOW!
+```
+
+**Kết Quả Mong Đợi:**
+- 🚨 ĐÃ PHÁT HIỆN LỪA ĐẢO
+- 🌍 Multilingual: Vietnamese + English + Chinese
+- ⚠️ Từ khóa: 9 keywords từ 3 ngôn ngữ
+- 🔢 Risk Multiplier: 1.3x (multilingual phishing)
+- Độ tin cậy: 95-100%
+- Lý do: Sử dụng nhiều ngôn ngữ là dấu hiệu lừa đảo nghiêm trọng
+
+### Ví Dụ 2: Email Hợp Lệ
 ```
 Dán vào Email Detector:
 

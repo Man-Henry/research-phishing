@@ -18,6 +18,22 @@ import joblib
 import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
+import sys
+# Add parent directory to path for both development and PyInstaller
+if getattr(sys, 'frozen', False):
+    # Running as compiled exe
+    import os
+    base_path = sys._MEIPASS
+    sys.path.insert(0, os.path.join(base_path, 'src'))
+else:
+    # Running as script
+    sys.path.insert(0, str(Path(__file__).parent.parent))
+
+try:
+    from utils.language_detector import LanguageDetector
+except ImportError:
+    # Fallback for PyInstaller
+    from src.utils.language_detector import LanguageDetector
 
 # Download required NLTK data (with error handling)
 try:
@@ -57,6 +73,9 @@ class EmailPhishingDetector:
             'suspicious_domain': r'@[a-z0-9]*-[a-z0-9]*\.[a-z]+',
         }
         
+        # Initialize language detector
+        self.language_detector = LanguageDetector()
+        
         # Load ML model if available (with caching)
         self.model_dir = Path(model_dir)
         self._load_models()
@@ -70,29 +89,42 @@ class EmailPhishingDetector:
         if EmailPhishingDetector._model_cache is not None:
             self.model = EmailPhishingDetector._model_cache.get('model')
             self.scaler = EmailPhishingDetector._model_cache.get('scaler')
+            self.n_features = EmailPhishingDetector._model_cache.get('n_features', 17)
             self.use_ml_model = self.model is not None and self.scaler is not None
             return
         
         # Try to load models from disk
         model_path = self.model_dir / 'email_phishing_detector.pkl'
         scaler_path = self.model_dir / 'email_scaler.pkl'
+        metadata_path = self.model_dir / 'email_metadata.pkl'
         
         try:
             if model_path.exists() and scaler_path.exists():
                 self.model = joblib.load(model_path)
                 self.scaler = joblib.load(scaler_path)
+                
+                # Load feature count from metadata
+                if metadata_path.exists():
+                    metadata = joblib.load(metadata_path)
+                    self.n_features = metadata.get('n_features', 17)
+                else:
+                    self.n_features = 17  # Default for backward compatibility
+                
                 self.use_ml_model = True
                 
                 # Cache models at class level
                 EmailPhishingDetector._model_cache = {
                     'model': self.model,
-                    'scaler': self.scaler
+                    'scaler': self.scaler,
+                    'n_features': self.n_features
                 }
                 
                 print(f"[OK] Loaded optimized Random Forest email model from {model_path}")
+                print(f"[OK] Model expects {self.n_features} features")
             else:
                 self.model = None
                 self.scaler = None
+                self.n_features = 17
                 self.use_ml_model = False
                 print(f"[WARNING] No pre-trained model found at {model_path}")
                 print(f"  Using heuristic-based detection only.")
@@ -263,11 +295,17 @@ class EmailPhishingDetector:
         # Convert to array for prediction
         features = np.array(list(features_dict.values()), dtype=np.float32)
         
+        # Auto-padding: if model expects more features, pad with zeros
+        if hasattr(self, 'n_features') and len(features) < self.n_features:
+            padding = np.zeros(self.n_features - len(features))
+            features = np.hstack([features, padding])
+            print(f"[INFO] Padded features from {len(features_dict)} to {self.n_features}")
+        
         # Use provided model, or fall back to loaded model, or use heuristics
         active_model = model if model is not None else (self.model if self.use_ml_model else None)
         
         # Always calculate heuristic score for validation
-        heuristic_score = self._heuristic_score(features)
+        heuristic_score = self._heuristic_score(features[:len(features_dict)])  # Use original features for heuristics
         
         if active_model is not None:
             # Use Random Forest model
@@ -379,6 +417,100 @@ class EmailPhishingDetector:
             score += 0.25
         
         return min(1.0, score)
+    
+    def analyze_multilingual_email(self, email_content: str, email_headers: Dict = None) -> Dict:
+        """
+        Enhanced analysis with LANGUAGE DETECTION and TRANSLATION support.
+        
+        Args:
+            email_content: Body text of the email
+            email_headers: Optional email headers (From, Subject, etc.)
+            
+        Returns:
+            Dictionary with detection results + language analysis + translation
+        """
+        # Ensure email_headers is a dict
+        if email_headers is None:
+            email_headers = {}
+        
+        # Step 1: Language analysis
+        language_analysis = self.language_detector.analyze_email_language(email_content)
+        
+        # Step 2: Use translated text if needed for better feature extraction
+        content_for_analysis = email_content
+        if language_analysis['translation']['translated_text']:
+            content_for_analysis = language_analysis['translation']['translated_text']
+        
+        # Step 3: Extract features from (possibly translated) content
+        features = self.extract_features(content_for_analysis, email_headers)
+        
+        # Step 4: ML prediction
+        if self.use_ml_model:
+            features_scaled = self.scaler.transform(features.reshape(1, -1))
+            ml_prediction = self.model.predict(features_scaled)[0]
+            ml_proba = self.model.predict_proba(features_scaled)[0]
+            ml_phishing_prob = float(ml_proba[1])
+        else:
+            ml_prediction = None
+            ml_phishing_prob = None
+        
+        # Step 5: Heuristic scoring (with language risk factor)
+        heuristic_score = self._heuristic_score(features)
+        
+        # Apply language risk multiplier
+        language_risk = language_analysis['phishing']['risk_factor']
+        heuristic_score = min(heuristic_score * language_risk, 1.0)
+        
+        # Add multilingual phishing keyword score
+        if language_analysis['phishing']['keyword_count'] > 0:
+            heuristic_score = min(
+                heuristic_score + language_analysis['phishing']['score'],
+                1.0
+            )
+        
+        # Step 6: Hybrid prediction (ML 60% + Heuristics 40%)
+        if self.use_ml_model and ml_phishing_prob is not None:
+            combined_score = (ml_phishing_prob * 0.6) + (heuristic_score * 0.4)
+            prediction = 1 if combined_score >= 0.5 else 0
+            
+            if prediction == 1:
+                confidence = combined_score
+            else:
+                confidence = 1.0 - combined_score
+            
+            # Override for strong signals
+            if heuristic_score > 0.7:
+                prediction = 1
+                confidence = max(confidence, heuristic_score)
+            elif heuristic_score < 0.1 and ml_phishing_prob < 0.3:
+                prediction = 0
+                confidence = max(confidence, 0.8)
+        else:
+            prediction = 1 if heuristic_score > 0.5 else 0
+            confidence = float(heuristic_score)
+        
+        return {
+            'is_phishing': bool(prediction),
+            'confidence': confidence,
+            'features': features,
+            'language': {
+                'primary': language_analysis['language']['primary'],
+                'confidence': language_analysis['language']['confidence'],
+                'is_multilingual': language_analysis['language']['is_multilingual'],
+                'all_detected': language_analysis['language']['all_detected']
+            },
+            'multilingual_phishing': {
+                'detected': language_analysis['phishing']['keyword_count'] > 0,
+                'keywords': language_analysis['phishing']['keywords_found'],
+                'keyword_count': language_analysis['phishing']['keyword_count'],
+                'risk_multiplier': language_risk,
+                'score': language_analysis['phishing']['score']
+            },
+            'translation': {
+                'needed': language_analysis['translation']['needed'],
+                'translated_text': language_analysis['translation']['translated_text']
+            }
+        }
 
 
 class EmailHeaderParser:

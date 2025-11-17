@@ -253,3 +253,74 @@ footer {
 .shadow {
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
 }
+
+/* Hidden elements for JavaScript control */
+.hidden {
+    display: none;
+}
+
+/* Icon sizes */
+.icon-large {
+    font-size: 3rem;
+}
+
+.icon-primary {
+    color: #007bff;
+}
+
+.icon-success {
+    color: #28a745;
+}
+
+/* Progress bar initial state */
+.progress-bar-initial {
+    width: 0%;
+}
+
+/* Progress bar large size */
+.progress-lg {
+    height: 30px;
+}
+
+/* Dark theme body */
+body.dark-theme {
+    background-color: #f8f9fa;
+}
+
+/* Tab styling */
+.nav-tabs .nav-link {
+    color: #495057;
+    font-weight: 500;
+}
+
+.nav-tabs .nav-link.active {
+    font-weight: 600;
+}
+
+.nav-tabs .nav-link:hover {
+    border-color: #dee2e6 #dee2e6 #fff;
+}
+
+/* Card enhancements */
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+/* Badge animation */
+.badge {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Badge icon size */
+.badge-icon-sm {
+    font-size: 8px;
+}
